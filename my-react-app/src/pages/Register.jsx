@@ -36,7 +36,7 @@ export default function Register() {
       const data = await response.json();
       localStorage.setItem("token", data.token);
       alert("Регистрация прошла успешно!");
-      window.location.href = "/dashboard"; // редирект после регистрации
+      window.location.href = "/profile"; // редирект после регистрации
     } catch (err) {
       setError(err.message);
     } finally {

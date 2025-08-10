@@ -20,12 +20,11 @@ export default function Login() {
 
     try {
       const response = await fetch("http://localhost:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password }),
+})
+
 
       if (!response.ok) {
         throw new Error("Неверный email или пароль");
@@ -34,7 +33,7 @@ export default function Login() {
       const data = await response.json();
       localStorage.setItem("token", data.token);
       alert("Успешный вход!");
-      window.location.href = "/dashboard"; // редирект
+      window.location.href = "/profile"; // редирект
     } catch (err) {
       setError(err.message);
     } finally {
