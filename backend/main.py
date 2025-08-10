@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
  # test
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
 
 app = FastAPI()
 
@@ -29,6 +30,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 fake_users_db = {}
+
+
+class UserOut(BaseModel):
+    email: EmailStr
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -62,3 +67,7 @@ async def login(user: UserCreate):
     access_token = create_access_token(data={"sub": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"token": access_token}
 
+@app.get("/api/users", response_model=List[UserOut])
+async def get_users():
+    users = [{"email": u["email"]} for u in fake_users_db.values()]
+    return users
