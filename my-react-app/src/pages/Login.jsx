@@ -27,6 +27,7 @@ export default function Login() {
 
 
       if (!response.ok) {
+        console.error("Ошибка при логине:", data.detail || data.message || data);
         throw new Error("Неверный email или пароль");
       }
 
