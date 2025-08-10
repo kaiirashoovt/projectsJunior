@@ -1,6 +1,6 @@
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 
-export function isAuthenticated() {
+export default function isAuthenticated() {
   const token = localStorage.getItem("token");
   if (!token) return false;
 
