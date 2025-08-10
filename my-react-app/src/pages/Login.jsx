@@ -27,7 +27,6 @@ export default function Login() {
 
 
       if (!response.ok) {
-        console.error("Ошибка при логине:", data.detail || data.message || data);
         throw new Error("Неверный email или пароль");
       }
 
@@ -37,6 +36,8 @@ export default function Login() {
       window.location.href = "/profile"; // редирект
     } catch (err) {
       setError(err.message);
+              console.error("Ошибка при логине:", data.detail || data.message || data);
+
     } finally {
       setLoading(false);
     }
