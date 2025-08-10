@@ -60,6 +60,7 @@ export default function Navbar() {
             { to: "/", label: "Главная" },
             { to: "/about", label: "О нас" },
             { to: "/contact", label: "Контакты" },
+            { to: "/login", label: "Войти" },
           ].map((item) => (
             <Link
               key={item.to}

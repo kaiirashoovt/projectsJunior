@@ -5,6 +5,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import BottomMenu from './components/BottomMenu';
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import {HomeIcon,Archive,User,Settings,Github} from "lucide-react";
 
 function AppWrapper() {
@@ -27,6 +28,7 @@ function AppWrapper() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
         </Routes>
               <BottomMenu 

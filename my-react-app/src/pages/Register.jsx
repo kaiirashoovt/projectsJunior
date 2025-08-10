@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/login", {
+      const response = await fetch("http://localhost:8000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,13 +28,15 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        throw new Error("Неверный email или пароль");
+        const data = await response.json();
+        // Можно получить ошибку с бэка
+        throw new Error(data.message || "Ошибка регистрации");
       }
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
-      alert("Успешный вход!");
-      window.location.href = "/dashboard"; // редирект
+      alert("Регистрация прошла успешно!");
+      window.location.href = "/dashboard"; // редирект после регистрации
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,8 +52,7 @@ export default function Login() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md bg-gray-800 rounded-2xl shadow-lg p-8"
       >
-
-        <h2 className="text-3xl font-bold mb-6 text-center">Вход в аккаунт</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Регистрация</h2>
 
         {error && (
           <motion.div
@@ -91,14 +92,14 @@ export default function Login() {
             disabled={loading}
             className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition font-semibold disabled:opacity-50"
           >
-            {loading ? "Входим..." : "Войти"}
+            {loading ? "Регистрация..." : "Зарегистрироваться"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-gray-400 text-center">
-          Нет аккаунта?{" "}
-          <a href="/register" className="text-blue-400 hover:underline">
-            Зарегистрироваться
+          Уже есть аккаунт?{" "}
+          <a href="/login" className="text-blue-400 hover:underline">
+            Войти
           </a>
         </p>
       </motion.div>
