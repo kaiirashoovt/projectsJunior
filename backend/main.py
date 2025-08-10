@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://kokonaihub.onrender.com/"],  # адрес фронтенда
+    allow_origins=["https://kokonaihub.onrender.com"],  # адрес фронтенда
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
