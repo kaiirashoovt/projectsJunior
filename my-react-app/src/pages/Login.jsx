@@ -27,8 +27,11 @@ export default function Login() {
 
 
       if (!response.ok) {
-        throw new Error("Неверный email или пароль");
-      }
+  const errorData = await response.json().catch(() => ({}));
+  const errorMessage = errorData.detail || errorData.message || "Неверный email или пароль";
+  throw new Error(errorMessage);
+}
+
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
@@ -36,7 +39,7 @@ export default function Login() {
       window.location.href = "/profile"; // редирект
     } catch (err) {
       setError(err.message);
-              console.error("Ошибка при логине:", data.detail || data.message || data);
+      console.error("Ошибка при логине:", err);
 
     } finally {
       setLoading(false);
