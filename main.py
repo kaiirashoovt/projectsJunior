@@ -4,14 +4,14 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-
+ # test
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # адрес фронтенда
+    allow_origins=["https://kokonaihub.onrender.com/"],  # адрес фронтенда
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,3 +61,4 @@ async def login(user: UserCreate):
         raise HTTPException(status_code=400, detail="Неверный email или пароль")
     access_token = create_access_token(data={"sub": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"token": access_token}
+
