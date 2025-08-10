@@ -4,7 +4,6 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
- # test
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
