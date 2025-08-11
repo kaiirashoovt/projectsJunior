@@ -191,13 +191,13 @@ async def update_user_by_email(
             raise HTTPException(status_code=400, detail="Email уже используется другим пользователем")
 
     field_map = {
-        "fullName": "full_name",
-        "avatarUrl": "avatar_url",
+        "fullName": "fullname",
         "email": "email",
         "phone": "phone",
         "bio": "bio",
+        "avatarUrl": "avatarurl",
     }
-
+    
     for field, value in user_update.dict(exclude_unset=True).items():
         orm_field = field_map.get(field)
         if orm_field:
