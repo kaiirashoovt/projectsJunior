@@ -69,7 +69,7 @@ class User(Base):
 # ---------------------- Pydantic модели ----------------------
 class UserOut(BaseModel):
     email: EmailStr
-    fullName: Optional[str] = None
+    fullname: Optional[str] = None
     phone: Optional[str] = None
     bio: Optional[str] = None
     avatarUrl: Optional[str] = None
@@ -193,7 +193,7 @@ async def get_user_by_email(
     # Для адаптации имён из модели User в Pydantic
     user_data = {
         "email": user.email,
-        "fullName": user.fullname,
+        "fullname": user.fullname,
         "phone": user.phone,
         "bio": user.bio,
         "avatarUrl": user.avatarurl,
