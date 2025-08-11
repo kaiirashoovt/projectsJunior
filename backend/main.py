@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends,Request
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import jwt
@@ -143,7 +143,15 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
     )
     return {"token": access_token}
 
+@app.post("/api/logout")
+async def logout(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Токен отсутствует")
 
+    token = auth_header.split(" ")[1]
+    # Здесь можно записать логи, кто вышел, но токен мы не блокируем
+    return {"message": "Logged out"}
 
 
 @app.get("/api/users", response_model=List[UserOut])
@@ -157,5 +165,5 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
+    
 
