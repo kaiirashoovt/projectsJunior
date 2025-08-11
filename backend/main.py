@@ -11,6 +11,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
 from datetime import datetime
+from fastapi import HTTPException, Path
+
 import os
 
 # ---------------------- Инициализация приложения ----------------------
@@ -160,6 +162,16 @@ async def get_users(db: AsyncSession = Depends(get_db)):
     users = result.scalars().all()
     return users
 
+@app.get("/api/users/{user_id}", response_model=UserOut)
+async def get_user_by_id(
+    user_id: int = Path(..., description="ID пользователя"),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    return user
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
 async def on_startup():
