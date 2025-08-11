@@ -218,7 +218,7 @@ async def update_user_by_email(
             raise HTTPException(status_code=400, detail="Email уже используется другим пользователем")
 
     field_map = {
-        "fullName": "fullname",
+        "fullname": "fullname",
         "email": "email",
         "phone": "phone",
         "bio": "bio",
