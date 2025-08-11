@@ -69,9 +69,14 @@ class User(Base):
 # ---------------------- Pydantic модели ----------------------
 class UserOut(BaseModel):
     email: EmailStr
-    
+    fullName: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    avatarUrl: Optional[str] = None
+
     class Config:
         from_attributes = True
+
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -184,7 +189,16 @@ async def get_user_by_email(
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
-    return user
+    
+    # Для адаптации имён из модели User в Pydantic
+    user_data = {
+        "email": user.email,
+        "fullName": user.fullname,
+        "phone": user.phone,
+        "bio": user.bio,
+        "avatarUrl": user.avatarurl,
+    }
+    return user_data
 
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
