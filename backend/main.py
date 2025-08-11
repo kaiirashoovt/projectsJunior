@@ -57,9 +57,14 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, default="")
+    fullname = Column(String, nullable=True)  # если хочешь, отдельное поле
+    phone = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
+    avatarurl = Column(String, nullable=True)  # поле для аватара
     email = Column(String, unique=True, index=True, nullable=False)
-    password = Column("pass", String, nullable=False)  # в БД — pass, в коде — password
+    password = Column("pass", String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
 
 # ---------------------- Pydantic модели ----------------------
 class UserOut(BaseModel):
@@ -76,12 +81,12 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class  UserUpdate (BaseModel):
-    fullName: Optional[str] = None
+class UserUpdate(BaseModel):
+    fullname: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     bio: Optional[str] = None
-    avatarUrl: Optional[str] = None
+    avatarurl: Optional[str] = None
 # ---------------------- Утилиты ----------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -181,7 +186,6 @@ async def get_user_by_email(
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     return user
 
-
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
     user_update: UserUpdate,
@@ -193,30 +197,42 @@ async def update_user_by_email(
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-    # Если в запросе есть email и он отличается от текущего — проверяем уникальность
+    # Проверка уникальности email, если меняется
     if user_update.email and user_update.email != user.email:
         existing = await db.execute(select(User).where(User.email == user_update.email))
         if existing.scalars().first():
             raise HTTPException(status_code=400, detail="Email уже используется другим пользователем")
 
     field_map = {
-        "fullname": "fullname",
+        "fullName": "fullname",
         "email": "email",
         "phone": "phone",
         "bio": "bio",
-        "avatarurl": "avatarurl",
+        "avatarUrl": "avatarurl",
     }
-    
-    for field, value in user_update.dict(exclude_unset=True).items():
+
+    data = user_update.dict(exclude_unset=True)
+    data = {k: v for k, v in data.items() if v is not None and v != ""}
+
+    print("Обновляем пользователя:", user.email)
+    print("Данные для обновления:", data)
+
+    for field, value in data.items():
         orm_field = field_map.get(field)
+        print(f"Обновляем поле {orm_field} значением {value}")
         if orm_field:
             setattr(user, orm_field, value)
 
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    try:
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    except Exception as e:
+        print("Ошибка при сохранении:", e)
+        raise HTTPException(status_code=500, detail="Ошибка обновления пользователя")
 
     return user
+
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
 async def on_startup():

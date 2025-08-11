@@ -15,7 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useLocation } from 'react-router-dom';
 
 
-
+// import { FaDiscord } from "react-icons/fa";
 import {HomeIcon,Archive,User,Settings,Github,LogOut } from "lucide-react";
 
 function AppWrapper() {
@@ -41,42 +41,7 @@ function AppWrapper() {
     },
     { icon: <Settings color="#7C3AED" size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
     { icon: <Github  color="#7C3AED"size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
-    // {
-    //   icon: <LogOut color="#7C3AED" size={18} />,
-    //   label: 'LogOut',
-    //   onClick: async () => {
-    //     try {
-    //       const token = localStorage.getItem("token");
-    //       if (!token) throw new Error("Токен не найден");
-
-    //       const response = await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/logout", {
-    //         method: "POST",
-    //         headers: {
-    //           "Authorization": `Bearer ${token}`,
-    //           "Content-Type": "application/json"
-    //         }
-    //       });
-
-    //       if (!response.ok) {
-    //         // Можно выдать сообщение об ошибке, если нужно
-    //         console.warn("Ошибка при logout:", response.status);
-    //       }
-    //     } catch (error) {
-    //       console.error("Ошибка logout:", error);
-    //     } finally {
-    //       // Удаляем токен и перенаправляем вне зависимости от результата fetch
-    //       localStorage.removeItem("token");
-    //       navigate("/login")
-    //       toast.info("Вы вышли!", {
-    //         className: "bg-green-600 text-white font-bold",
-    //         bodyClassName: "text-sm",
-    //         progressClassName: "bg-white"
-    //       });
-
-    //     }
-    //   }
-    // }
-
+    { lable: 'Наш Discord', onclick: () => window.open('https://discord.gg/KJkGhGCQ') },
   ];
 
   if (token) {
