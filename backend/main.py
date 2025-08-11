@@ -96,10 +96,6 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # ---------------------- Роуты ----------------------
-@app.get("/")
-async def root():
-    return {"status": "ok"}
-
 @app.post("/api/register")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == user.email))
@@ -174,7 +170,16 @@ async def get_users(db: AsyncSession = Depends(get_db)):
     users = result.scalars().all()
     return users
 
-
+@app.get("/api/users/{user_email}", response_model=UserOut)
+async def get_user_by_email(
+    user_email: str = Path(..., description="Email пользователя"),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.email == user_email))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    return user
 
 
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
@@ -195,11 +200,11 @@ async def update_user_by_email(
             raise HTTPException(status_code=400, detail="Email уже используется другим пользователем")
 
     field_map = {
-        "fullName": "fullname",
+        "fullname": "fullname",
         "email": "email",
         "phone": "phone",
         "bio": "bio",
-        "avatarUrl": "avatarurl",
+        "avatarurl": "avatarurl",
     }
     
     for field, value in user_update.dict(exclude_unset=True).items():
@@ -212,8 +217,6 @@ async def update_user_by_email(
     await db.refresh(user)
 
     return user
-
-
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
 async def on_startup():
