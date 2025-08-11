@@ -88,7 +88,9 @@ useEffect(() => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`https://my-fastapi-backend-f4e2.onrender.com/api/users/${user_email}`, {
+        console.log("Отправляем данные:", user_email, formData);
+
+      const res = await fetch(`https://my-fastapi-backend-f4e2.onrender.com/api/user_update/${user_email}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
