@@ -15,22 +15,23 @@ import {HomeIcon,Archive,User,Settings,Github,LogOut } from "lucide-react";
 function AppWrapper() {
   const navigate = useNavigate();
   const items = [
-    { icon: <HomeIcon size={18} />, color:'#7C3AED', label: 'Home', onClick: () => navigate("/home") },
-    { icon: <Archive size={18} />, label: 'Archive', onClick: () => alert('Archive!') },
-    { icon: <User size={18} />, label: 'Profile', onClick: () => {
+    { icon: <HomeIcon color="#7C3AED" size={18} />, label: 'Home', onClick: () => navigate("/home") },
+    { icon: <Archive color="#7C3AED" size={18} />, label: 'Archive', onClick: () => alert('Archive!') },
+    { icon: <User  color="#7C3AED" size={18} />, label: 'Profile', onClick: () => {
         if (isAuthenticated()) {
+          console.log("Все ок")
           navigate("/profile");
         } else {
           alert("Сначала авторизуйтесь");
           navigate("/login");
-        }
+        } 
       },},
-    { icon: <Settings size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
-    { icon: <Github size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
-    { icon: <LogOut size={18} />, label: 'LogOut', onClick: async () => {
+    { icon: <Settings color="#7C3AED" size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
+    { icon: <Github  color="#7C3AED"size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
+    { icon: <LogOut color="#7C3AED" size={18} />, label: 'LogOut', onClick: async () => {
       const token = localStorage.getItem("token");
 
-      await fetch("http://localhost:8000/logout", {
+      await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/logout", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
