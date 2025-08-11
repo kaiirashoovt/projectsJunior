@@ -10,7 +10,7 @@ import Profile from "./pages/Profile";
 import PrivateRoute from "./auth/PrivateRoute"
 import { isAuthenticated } from "./auth/isAuthenticated";
 
-import {HomeIcon,Archive,User,Settings,Github} from "lucide-react";
+import {HomeIcon,Archive,User,Settings,Github,LogOut } from "lucide-react";
 
 function AppWrapper() {
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ function AppWrapper() {
       },},
     { icon: <Settings size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
     { icon: <Github size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
+    { icon: <LogOut size={18} />, label: 'LogOut', onClick: () => {localStorage.removeItem("token");window.location.href = "/login";}}
   ];
 
   return (
