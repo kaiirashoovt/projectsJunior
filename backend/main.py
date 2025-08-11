@@ -184,8 +184,8 @@ async def get_user_by_email(
 
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
+    user_update: UserUpdate,  # тело запроса — без дефолта, идёт первым
     user_email: str = Path(..., description="Email пользователя"),
-    user_update: UserUpdate,              # <-- тут тело запроса
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(User).where(User.email == user_email))
