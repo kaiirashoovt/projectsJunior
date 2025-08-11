@@ -63,6 +63,7 @@ class User(Base):
 # ---------------------- Pydantic модели ----------------------
 class UserOut(BaseModel):
     email: EmailStr
+    
     class Config:
         from_attributes = True
 
@@ -171,6 +172,27 @@ async def get_user_by_email(
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
+    return user
+
+
+@app.put("/api/users/{user_email}", response_model=UserOut)
+async def update_user_by_email(
+    user_email: str = Path(..., description="Email пользователя"),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.email == user_email))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    # Обновляем только поля, которые пришли в запросе
+    for field, value in UserOut.dict(exclude_unset=True).items():
+        setattr(user, field, value)
+
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
     return user
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
