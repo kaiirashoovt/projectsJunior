@@ -175,7 +175,7 @@ async def get_user_by_email(
     return user
 
 
-@app.put("/api/users/{user_email}", response_model=UserOut)
+@app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
     user_email: str = Path(..., description="Email пользователя"),
     db: AsyncSession = Depends(get_db),
