@@ -184,7 +184,7 @@ async def get_user_by_email(
 
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
-    user_update: UserUpdate,  # тело запроса — без дефолта, идёт первым
+    user_update: UserUpdate,
     user_email: str = Path(..., description="Email пользователя"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -193,15 +193,25 @@ async def update_user_by_email(
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-    # Обновляем только поля, которые пришли в запросе
+    field_map = {
+        "fullName": "full_name",
+        "avatarUrl": "avatar_url",
+        "email": "email",
+        "phone": "phone",
+        "bio": "bio",
+    }
+
     for field, value in user_update.dict(exclude_unset=True).items():
-        setattr(user, field, value)
+        orm_field = field_map.get(field)
+        if orm_field:
+            setattr(user, orm_field, value)
 
     db.add(user)
     await db.commit()
     await db.refresh(user)
 
     return user
+
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
 async def on_startup():
