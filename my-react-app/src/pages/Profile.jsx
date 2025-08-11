@@ -60,11 +60,11 @@ useEffect(() => {
       const data = await res.json();
       setUser(data);
       setFormData({
-        fullName: data.fullName || "",
+        fullname: data.fullname || "",
         email: data.email || "",
         phone: data.phone || "",
         bio: data.bio || "",
-        avatarUrl: data.avatarUrl || "",
+        avatarurl: data.avatarurl || "",
       });
       setError(null);
     } catch (e) {
