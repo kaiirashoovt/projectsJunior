@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer,toast } from 'react-toastify'
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,9 +37,15 @@ export default function Login() {
 
 
       const data = await response.json();
+      console.log("Ответ логина:", data);
       localStorage.setItem("token", data.token);
-      alert("Успешный вход!");
-      window.location.href = "/profile"; // редирект
+      console.log("Токен после записи:", localStorage.getItem("token"));
+      toast.success("Вы успешно авторизовались!", {
+  className: "bg-green-600 text-white font-bold",
+  bodyClassName: "text-sm",
+  progressClassName: "bg-white"
+});
+      navigate("/profile")
     } catch (err) {
       setError(err.message);
       console.error("Ошибка при логине:", err);
