@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends,Request
+from fastapi import FastAPI, HTTPException, Depends,Request,Path
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import jwt
@@ -11,7 +11,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
 from datetime import datetime
-from fastapi import HTTPException, Path
+from typing import Optional
+
 
 import os
 
@@ -75,6 +76,12 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class  UserUpdate (BaseModel):
+    fullName: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    avatarUrl: Optional[str] = None
 # ---------------------- Утилиты ----------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -178,6 +185,7 @@ async def get_user_by_email(
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
     user_email: str = Path(..., description="Email пользователя"),
+    user_update: UserUpdate,              # <-- тут тело запроса
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(User).where(User.email == user_email))
@@ -186,7 +194,7 @@ async def update_user_by_email(
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
     # Обновляем только поля, которые пришли в запросе
-    for field, value in UserOut.dict(exclude_unset=True).items():
+    for field, value in user_update.dict(exclude_unset=True).items():
         setattr(user, field, value)
 
     db.add(user)
