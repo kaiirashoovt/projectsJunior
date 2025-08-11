@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ToastContainer,toast } from 'react-toastify'
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -35,7 +36,12 @@ export default function Register() {
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
-      alert("Регистрация прошла успешно!");
+    //   alert("Регистрация прошла успешно!");
+      toast.success("Регистрация прошла успешно!", {
+        className: "bg-green-600 text-white font-bold",
+        bodyClassName: "text-sm",
+        progressClassName: "bg-white"
+      });
       window.location.href = "/profile"; // редирект после регистрации
     } catch (err) {
       setError(err.message);
