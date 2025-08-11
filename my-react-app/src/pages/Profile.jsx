@@ -25,7 +25,7 @@ function ProfilePage() {
   const [user, setUser] = useState(null);
   const [isEditing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
+    fullname: "",
     email: "",
     phone: "",
     bio: "",
@@ -139,8 +139,8 @@ useEffect(() => {
           className="w-24 h-24 rounded-full object-cover border-2 border-purple-600"
         />
         <div>
-          <h1 className="text-3xl font-semibold">{user?.fullName || user?.email || "Пользователь"}</h1>
-          {user?.fullName && <p className="text-gray-400">{user?.email}</p>}
+          <h1 className="text-3xl font-semibold">{user?.fullname || user?.email || "Пользователь"}</h1>
+          {user?.fullname && <p className="text-gray-400">{user?.email}</p>}
           <p className="text-gray-400">{user?.phone || ""}</p>
         </div>
         <button
@@ -168,14 +168,14 @@ useEffect(() => {
           className="space-y-6 max-w-lg"
         >
           <div>
-            <label htmlFor="fullName" className="block mb-1 font-medium">
+            <label htmlFor="fullname" className="block mb-1 font-medium">
               ФИО
             </label>
             <input
-              id="fullName"
-              name="fullName"
+              id="fullname"
+              name="fullname"
               type="text"
-              value={formData.fullName}
+              value={formData.fullname}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:outline-none"
               placeholder="ФИО отсутствует"
