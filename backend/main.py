@@ -96,6 +96,10 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # ---------------------- Роуты ----------------------
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
 @app.post("/api/register")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == user.email))
