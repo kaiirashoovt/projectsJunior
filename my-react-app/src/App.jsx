@@ -27,7 +27,20 @@ function AppWrapper() {
       },},
     { icon: <Settings size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
     { icon: <Github size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
-    { icon: <LogOut size={18} />, label: 'LogOut', onClick: () => {localStorage.removeItem("token");window.location.href = "/login";}}
+    { icon: <LogOut size={18} />, label: 'LogOut', onClick: async () => {
+      const token = localStorage.getItem("token");
+
+      await fetch("http://localhost:8000/logout", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }}
   ];
 
   return (
