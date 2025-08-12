@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {Settings} from  "lucide-react"
+import {Settings,CircleUserRound } from  "lucide-react"
+import { motion } from "framer-motion";
+import Tiptap from "../components/TipTap";
 
 
 
@@ -33,8 +35,14 @@ function ProfilePage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [bioDraft, setBioDraft] = useState(formData.bio);
 
-  
+useEffect(() => {
+  if (!isEditing) {
+    setBioDraft(formData.bio);
+  }
+}, [formData.bio, isEditing]);
+
 useEffect(() => {
   async function loadUserEmail() {
     const email = await getUserIdFromToken();
@@ -89,11 +97,11 @@ useEffect(() => {
     setError(null);
     try {
         console.log("Отправляем данные:", user_email, formData);
-
+      const updatedData = { ...formData, bio: bioDraft };
       const res = await fetch(`https://my-fastapi-backend-f4e2.onrender.com/api/user_update/${user_email}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedData),
       });
       if (!res.ok) throw new Error("Ошибка при сохранении");
       const updatedUser = await res.json();
@@ -131,42 +139,36 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 font-sans p-8 mx-auto">
-      <header className="flex items-center space-x-6 mt-10 mb-8">
-        <img
-          src={formData.avatarUrl || "/default-avatar.png"}
-          alt="Avatar"
-          className="w-24 h-24 rounded-full object-cover border-2 border-purple-600"
-        />
-        <div>
-          <h1 className="text-3xl font-semibold">{user?.fullname || user?.email || "Пользователь"}</h1>
-          {user?.fullname && <p className="text-gray-400">{user?.email}</p>}
-          <p className="text-gray-400">{user?.phone || ""}</p>
-        </div>
-        <button
-        onClick={() => setEditing((v) => !v)}
-        className="ml-auto px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none flex items-center"
-        aria-label={isEditing ? "Отменить редактирование" : "Редактировать профиль"}
-        >
-        {isEditing ? (
-        "Отмена"
-        ) : (
-        <>
-            <Settings className="mr-2" />
-            Редактировать
-        </>
-        )}
-        </button>
-      </header>
+<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center px-8">
+                {/* min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white */}
+  <motion.div className="w-full max-w-3xl  rounded-lg shadow-lg p-8 mt-12 mt-6 mb-8">
+        <header className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
+  {formData.avatarUrl ? (
+    <img
+      src={formData.avatarUrl}
+      alt="Avatar"
+      className="w-24 h-24 rounded-full object-cover border-4 border-purple-600"
+    />
+  ) : (
+    <CircleUserRound className="w-24 h-24 rounded-full text-purple-600" />
+  )}
+  <div className="text-center sm:text-left flex-1">
+    <h1 className="text-3xl font-semibold">{user?.fullname || user?.email || "Пользователь"}</h1>
+    {user?.fullname && <p className="text-gray-400">{user?.email}</p>}
+    <p className="text-gray-400">{user?.phone || ""}</p>
+  </div>
+
+</header>
+
 
       {isEditing ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
-          className="space-y-6 max-w-lg"
-        >
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        
+      }}
+      className="space-y-6 max-w-lg mx-auto px-2 sm:px-0"
+    >
           <div>
             <label htmlFor="fullname" className="block mb-1 font-medium">
               ФИО
@@ -216,67 +218,81 @@ useEffect(() => {
             <label htmlFor="bio" className="block mb-1 font-medium">
               О себе
             </label>
-            <textarea
-              id="bio"
-              name="bio"
-              rows="4"
-              value={formData.bio}
-              onChange={handleChange}
-              placeholder="Расскажите о себе"
-              className="w-full px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:outline-none resize-none"
-            />
-          </div>
+                <Tiptap value={bioDraft} onChange={setBioDraft} />
 
-          <div className="flex items-center space-x-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center"
-            >
-              {loading ? (
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  ></path>
-                </svg>
-              ) : (
-                "Сохранить"
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="px-6 py-3 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-              disabled={loading}
-            >
-              Отмена
-            </button>
           </div>
 
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
       ) : (
-        <section className="max-w-lg prose prose-invert">
-          <h2>О себе</h2>
-          <p>{user?.bio || "Пользователь пока ничего не написал."}</p>
-        </section>
+            <section className="max-w-lg prose prose-invert">
+            <h2>О себе</h2>
+            {user?.bio ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: user.bio }}
+              />
+            ) : (
+              <p>Пользователь пока ничего не написал.</p>
+            )}
+          </section>
+
+        
       )}
+
+            {isEditing ? (
+<div className="mt-4 sm:mt-0 ml-auto flex space-x-4 ">
+  <button
+    onClick={() => handleSave()}
+    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors focus:outline-none flex items-center"
+    aria-label="Сохранить"
+  > 
+    {loading ? (
+      <svg
+        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white items-center"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v8z"
+        ></path>
+      </svg>
+    ) : (
+      "Сохранить"
+    )}
+  </button>
+
+  <button
+    onClick={() => setEditing(false)}
+    className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition-colors flex items-center"
+    aria-label="Отмена"
+  >
+    Отмена
+  </button>
+</div>
+
+) : (
+  <button
+    onClick={() => setEditing(true)}
+    className="mt-4 sm:mt-0 ml-auto px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors focus:outline-none flex items-center"
+    aria-label="Редактировать профиль"
+  >
+    <Settings className="mr-2" />
+    Редактировать
+  </button>
+)}
+
+    </motion.div>
     </div>
   );
 }
