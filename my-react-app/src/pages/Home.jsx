@@ -1,29 +1,35 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate  } from "react-router-dom";
-import Hero from "../components/Hero";
+import { useNavigate } from "react-router-dom";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import MagicBento from "../components/MagicBento";
-import BottomMenu from '../components/BottomMenu';
-import {
-  HomeIcon,
-  Archive,
-  User,
-  Settings,
-  Github,
-} from "lucide-react";
+import BottomMenu from "../components/BottomMenu";
 
 export default function Home() {
   const navigate = useNavigate();
-  const cards = [
-    { title: "О нас", description: "Ознакомьтесь с нашими проектами и узнайте о нас больше", link: "#" },
-    { title: "Контакты", description: "Контакты, социальные сети и прочее", link: "/contact" },
-    { title: "Мой GitHub", description: "Ссылка на мой профиль GitHub", link: "https://github.com/kaiirashoovt" },
+  const [open, setOpen] = useState(false);
+
+  const releases = [
+    { version: "v1.2.0", date: "14.08.2025", changes: "Добавлены новые виджеты и улучшен интерфейс" },
+    { version: "v1.1.5", date: "05.08.2025", changes: "Исправлены ошибки в анимациях" },
+    { version: "v1.1.0", date: "25.07.2025", changes: "Обновлён дизайн главной страницы" },
   ];
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <section className="py-20 flex flex-col items-center justify-center">
-        <MagicBento
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex">
+      {/* Основная зона */}
+      <main className="flex-1 flex flex-col mt-18">
+        {/* Приветствие */}
+        <section className="py-10 text-center">
+          <h2 className="text-3xl font-bold mb-2">Привет, гость! 👋</h2>
+          <p className="text-gray-400">
+            Добро пожаловать на наш проект. Здесь вы найдёте всё самое интересное!
+          </p>
+        </section>
+
+        {/* MagicBento */}
+        <section className="flex-1 flex flex-col items-center justify-center">
+          <MagicBento
             textAutoHide={true}
             enableStars={true}
             enableSpotlight={true}
@@ -34,10 +40,59 @@ export default function Home() {
             spotlightRadius={300}
             particleCount={12}
             glowColor="85, 0, 255"
-        />
-      </section>
+          />
+        </section>
 
+        {/* Места для будущих виджетов */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-10">
+          <div className="bg-gray-800/40 rounded-2xl p-6 border border-gray-700">
+            <h3 className="text-lg font-semibold mb-2">📊 Виджет статистики</h3>
+            <p className="text-gray-400">Здесь будет отображаться аналитика.</p>
+          </div>
+          <div className="bg-gray-800/40 rounded-2xl p-6 border border-gray-700">
+            <h3 className="text-lg font-semibold mb-2">📰 Новости</h3>
+            <p className="text-gray-400">Последние публикации и обновления.</p>
+          </div>
+        </section>
 
+        {/* <BottomMenu /> */}
+      </main>
+
+      {/* Плавающий виджет релизов */}
+      <div className="fixed bottom-4 right-4 w-72">
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-full flex items-center justify-between bg-gray-800 text-white px-3 py-2 rounded-t-lg border border-gray-700"
+        >
+          <span>📢 Обновления</span>
+          {open ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </button>
+
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            className="bg-gray-900/80 backdrop-blur-lg border border-t-0 border-gray-700 rounded-b-lg p-3 max-h-64 overflow-y-auto"
+          >
+            <ul className="space-y-2 text-sm text-gray-300">
+              {releases.map((r, i) => (
+                <li
+                  key={i}
+                  className="p-2 bg-gray-800/40 rounded-lg border border-gray-700"
+                >
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span className="text-green-500">{r.version}</span>
+                    <span>{r.date}</span>
+                  </div>
+                  <p>{r.changes}</p>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }
