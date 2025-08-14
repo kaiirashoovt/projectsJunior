@@ -78,7 +78,7 @@ function AppWrapper() {
 
   return (
     <div >
-      <main >
+      <main>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />

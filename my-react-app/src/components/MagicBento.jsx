@@ -23,7 +23,8 @@ const cardData = [
     title: "Контакты",
     description: "Наши контакты и соцсети",
     label: "Связь",
-    onClick: () => alert('Archive!') ,
+    // onClick: () => alert('Archive!') ,
+    url: "/contact",
   },
   {
     color: "58, 61, 71",
@@ -31,7 +32,7 @@ const cardData = [
     title: "GitHub",
     description: "Исходный код и проекты на GitHub",
     label: "Разработка",
-    url: "/contact",
+    url: "https://github.com/kaiirashoovt",
   },
   {
     color: "58, 61, 71",
@@ -55,7 +56,7 @@ const cardData = [
     title: "Поддержка",
     description: "Помощь клиентам и ответы на вопросы",
     label: "Сервис",
-    url: "/contact",
+    url: "/rest/api",
   },
 ];
 
@@ -686,6 +687,7 @@ const MagicBento = ({
 
       <BentoCardGrid gridRef={gridRef}>
         <div className="card-responsive grid gap-2">
+          
           {cardData.map((card, index) => {
             const baseClassName = `card flex flex-col justify-between relative aspect-[4/3] min-h-[200px] w-full max-w-full p-5 rounded-[20px] border border-solid font-light overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${enableBorderGlow ? "card--border-glow" : ""
               }`;
@@ -718,8 +720,10 @@ const MagicBento = ({
                   <div className="flex items-center gap-2 mb-2">
                     {card.icon && (
                       <card.icon size={18} className="text-indigo-400 shrink-0" />
-                    )}  
+                    )}
+                    <a href={card.url}> 
                     <span className="text-sm font-semibold opacity-90">{card.label}</span>
+                     </a> 
                   </div>
                   <div className="card__content flex flex-col relative text-white">
                     <h3

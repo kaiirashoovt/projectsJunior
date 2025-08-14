@@ -114,9 +114,21 @@ useEffect(() => {
     }
   }
 
+if (error) {
+  return (
+    <div className="flex flex-col justify-center items-center h-screen text-gray-400 bg-gray-900 gap-4">
+      <p>{error}</p>
+      <a href="/login" className="text-blue-400 hover:underline">
+        Войти
+      </a>
+    </div>
+  );
+}
+    
+
   if (!user_email) {
     return (
-      <div className="text-red-500 p-4 bg-gray-900 rounded max-w-md mx-auto mt-10 text-center">
+      <div className="flex justify-center items-center h-screen text-gray-400 bg-gray-900">
         {error || "Пользователь не найден"}
       </div>
     );
