@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0 --port $PORT",
     "updates": "node generateUpdates.js",
-    "prepare": "husky"
+    "prepare": "husky init"
+
   },
   "dependencies": {
     "@tiptap/extension-link": "^3.1.0",
