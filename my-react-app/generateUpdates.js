@@ -25,5 +25,4 @@ export const updates = ${JSON.stringify(releases, null, 2)};
 `;
 
 fs.writeFileSync(outputFile, fileContent, "utf8");
-
 console.log(`✅ Файл обновлений создан: ${outputFile}`);
