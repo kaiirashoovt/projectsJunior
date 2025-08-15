@@ -1,6 +1,13 @@
 export const updates = [
   {
     "date": "2025-08-15",
+    "version": "v1.0.3",
+    "changes": [
+      "Тест автогенерации"
+    ]
+  },
+  {
+    "date": "2025-08-15",
     "version": "v1.0.2",
     "changes": [
       "Твой коммит сообщение"
