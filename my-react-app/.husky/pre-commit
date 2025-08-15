@@ -1,8 +1,1 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Генерируем updates.jsx
-npm run updates
-
-# Добавляем его в staging
-git add src/updates.jsx
+npm test
