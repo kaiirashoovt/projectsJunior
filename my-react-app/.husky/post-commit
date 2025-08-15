@@ -2,4 +2,4 @@
 # Windows-совместимый post-commit hook
 npx node ./generateUpdates.cjs "Авто-коммит обновлений"
 git add src/updates.jsx
-git commit -m "Обновлён журнал обновлений" --no-verify || echo "Нет изменений для коммита"
+git commit -m "Обновлён журнал обновлений 1" --no-verify || echo "Нет изменений для коммита"
