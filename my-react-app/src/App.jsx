@@ -41,7 +41,7 @@ function AppWrapper() {
     },
     { icon: <Settings color="#7C3AED" size={18} />, label: 'Settings', onClick: () => alert('Settings!') },
     { icon: <Github  color="#7C3AED"size={18} />, label: 'Github', onClick: () => window.open('https://github.com/kaiirashoovt') },
-    { lable: 'Наш Discord', onclick: () => window.open('https://discord.gg/KJkGhGCQ') },
+    // { lable: 'Наш Discord', onclick: () => window.open('https://discord.gg/KJkGhGCQ') },
   ];
 
   if (token) {
