@@ -1,2 +1,4 @@
 #!/bin/sh
-npx node ./generateUpdates.cjs "$GIT_COMMIT_MESSAGE"
+npx node ./generateUpdates.cjs "Авто-коммит обновлений"
+git add src/updates.jsx
+git commit -m "Обновлён журнал обновлений" --no-verify || echo "Нет изменений для коммита"
