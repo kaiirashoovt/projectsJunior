@@ -1,5 +1,6 @@
 #!/bin/sh
-# Windows-совместимый post-commit hook
-npx node ./generateUpdates.cjs "Авто-коммит обновлений"
+. "$(dirname "$0")/_/husky.sh"
+
+# Запускаем скрипт Node
+node generateUpdates.cjs
 git add src/updates.jsx
-git commit -m "Обновлён журнал обновлений 1" --no-verify || echo "Нет изменений для коммита"
