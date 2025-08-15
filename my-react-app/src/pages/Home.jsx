@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import MagicBento from "../components/MagicBento";
 import BottomMenu from "../components/BottomMenu";
-
+import { updates } from "../updates";
 export default function Home() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -58,7 +58,6 @@ export default function Home() {
         {/* <BottomMenu /> */}
       </main>
 
-      {/* Плавающий виджет релизов */}
       <div className="fixed bottom-4 right-4 w-72">
         <button
           onClick={() => setOpen(!open)}
@@ -77,7 +76,7 @@ export default function Home() {
             className="bg-gray-900/80 backdrop-blur-lg border border-t-0 border-gray-700 rounded-b-lg p-3 max-h-64 overflow-y-auto"
           >
             <ul className="space-y-2 text-sm text-gray-300">
-              {releases.map((r, i) => (
+              {updates.map((r, i) => (
                 <li
                   key={i}
                   className="p-2 bg-gray-800/40 rounded-lg border border-gray-700"
@@ -86,10 +85,15 @@ export default function Home() {
                     <span className="text-green-500">{r.version}</span>
                     <span>{r.date}</span>
                   </div>
-                  <p>{r.changes}</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    {r.changes.map((c, j) => (
+                      <li key={j}>{c}</li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
+
           </motion.div>
         )}
       </div>
