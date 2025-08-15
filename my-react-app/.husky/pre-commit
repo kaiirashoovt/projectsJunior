@@ -1,8 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "🔄 Генерация src/updates.jsx..."
-node generateUpdates.js
+echo "🚀 Генерация updates.jsx..."
+npm run updates
 
-# Добавляем новый updates.jsx в коммит
+echo "📌 Добавляем src/updates.jsx в коммит..."
 git add src/updates.jsx
