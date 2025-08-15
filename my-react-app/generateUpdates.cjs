@@ -2,36 +2,39 @@
 const fs = require("fs");
 const path = require("path");
 
-const filePath = path.join(__dirname, "src/updates.jsx");
+const updatesFile = path.join(__dirname, "src", "updates.jsx");
 
-// Получаем текст коммита из аргументов
-const commitMessage = process.argv[2] || "Изменения";
+// Берём сообщение коммита из аргументов
+const commitMessage = process.argv[2] || "Обновления";
 
-// Читаем существующий файл, если есть
-let updates = [];
-if (fs.existsSync(filePath)) {
+// Читаем старые обновления
+let oldUpdates = [];
+if (fs.existsSync(updatesFile)) {
+  const content = fs.readFileSync(updatesFile, "utf8");
   try {
-    const content = fs.readFileSync(filePath, "utf-8");
-    updates = JSON.parse(content.replace(/export const updates = /, "").replace(/;$/, ""));
-  } catch (e) {
-    console.log("⚠️ Не удалось прочитать старый updates.jsx, создаём новый");
-  }
+    oldUpdates = eval(content.match(/export const updates = (\[.*\]);/s)[1]);
+  } catch {}
 }
 
-// Определяем новую версию
-let lastVersion = updates[0]?.version || "v0.0.0";
-let [major, minor, patch] = lastVersion.slice(1).split(".").map(Number);
-patch += 1;
-const newVersion = `v${major}.${minor}.${patch}`;
+// Авто-генерация версии
+const lastVersion = oldUpdates[0]?.version || "v1.0.0";
+const [major, minor, patch] = lastVersion.slice(1).split(".").map(Number);
+const newVersion = `v${major}.${minor}.${patch + 1}`;
 
-// Добавляем новый блок в начало массива
-updates.unshift({
-  date: new Date().toISOString().slice(0, 10),
+const today = new Date().toISOString().split("T")[0];
+
+const newUpdate = {
+  date: today,
   version: newVersion,
-  changes: [commitMessage]
-});
+  changes: [commitMessage],
+};
 
-// Сохраняем обратно
-const content = `export const updates = ${JSON.stringify(updates, null, 2)};`;
-fs.writeFileSync(filePath, content);
-console.log(`✅ src/updates.jsx обновлён (версия ${newVersion})`);
+// Добавляем сверху
+const newUpdates = [newUpdate, ...oldUpdates];
+
+const fileContent = `export const updates = ${JSON.stringify(newUpdates, null, 2)};`;
+
+// Сохраняем с LF
+fs.writeFileSync(updatesFile, fileContent.replace(/\r\n/g, "\n"));
+
+console.log("✅ src/updates.jsx обновлён");
