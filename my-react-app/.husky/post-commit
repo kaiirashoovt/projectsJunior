@@ -1,6 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Запускаем скрипт Node
-node generateUpdates.cjs
+node generateUpdates.cjs "$(git log -1 --pretty=%B)"
 git add src/updates.jsx
