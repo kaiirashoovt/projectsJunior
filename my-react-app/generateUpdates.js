@@ -1,41 +1,42 @@
-const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 
 const filePath = path.join(__dirname, "src", "updates.jsx");
 
-// Берём список файлов, добавленных в staging
-const changedFiles = execSync(
-  `git diff --cached --name-only --diff-filter=ACM`,
+// Получаем сообщение будущего коммита (из staging)
+const stagedMessage = execSync(
+  'git diff --cached --name-only --diff-filter=ACM | findstr /r /v "^$"',
   { encoding: "utf8" }
-).split("\n").filter(Boolean);
+);
 
-if (changedFiles.length === 0) process.exit(0);
-
-const lastChangeMessage = execSync(
-  `git log -1 --pretty=%B`,
-  { encoding: "utf8" }
-).trim();
+// Если нет изменений — выходим
+if (!stagedMessage.trim()) process.exit(0);
 
 // Читаем старый файл
-let oldReleases = [];
+let releases = [];
 if (fs.existsSync(filePath)) {
   const oldFile = fs.readFileSync(filePath, "utf8");
-  oldReleases = JSON.parse(oldFile.match(/export const updates = (.+);/s)[1]);
+  const match = oldFile.match(/export const updates = (.+);/s);
+  if (match) releases = JSON.parse(match[1]);
 }
 
-// Создаём новую запись
-const today = new Date().toISOString().split("T")[0];
-const version = `v1.${oldReleases.length + 1}.0`;
+// Новая версия
+const lastVersion = releases[0]?.version || "v0.0.0";
+const [major, minor, patch] = lastVersion.slice(1).split(".").map(Number);
+const newVersion = `v${major}.${minor}.${patch + 1}`;
 
-oldReleases.unshift({
+// Сообщение последнего staged коммита
+const commitMessage = execSync('git log -1 --pretty=%B', { encoding: "utf8" }).trim();
+
+// Новая запись
+const today = new Date().toISOString().split("T")[0];
+releases.unshift({
   date: today,
-  version,
-  changes: [lastChangeMessage]
+  version: newVersion,
+  changes: [commitMessage || "Изменения"]
 });
 
 // Записываем файл
-const content = `export const updates = ${JSON.stringify(oldReleases, null, 2)};`;
-fs.writeFileSync(filePath, content);
-
-console.log(`✅ updates.jsx обновлён`);
+fs.writeFileSync(filePath, `export const updates = ${JSON.stringify(releases, null, 2)};`, "utf8");
+console.log("✅ updates.jsx обновлён");
