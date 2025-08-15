@@ -1,29 +1,29 @@
-import fs from "fs";
-import simpleGit from "simple-git";
-import dayjs from "dayjs";
+// generateUpdates.js
+const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
-const git = simpleGit();
+const outputFile = path.join(__dirname, "src", "updates.jsx");
 
-async function generateUpdates() {
-  const logs = await git.log({ n: 20 });
+// Берём последние 20 коммитов
+const log = execSync(
+  `git log -n 20 --pretty=format:"%ad||%h||%s" --date=short`,
+  { encoding: "utf8" }
+);
 
-  const grouped = {};
-  logs.all.forEach(log => {
-    const date = dayjs(log.date).format("YYYY-MM-DD");
-    if (!grouped[date]) grouped[date] = [];
-    grouped[date].push(log.message);
-  });
-
-  const updatesArray = Object.keys(grouped).map(date => ({
+const releases = log.split("\n").map(line => {
+  const [date, hash, message] = line.split("||");
+  return {
     date,
-    version: "v" + dayjs(date).format("YY.MM.DD"),
-    changes: grouped[date]
-  }));
+    version: hash,
+    changes: [message]
+  };
+});
 
-  const content = `export const updates = ${JSON.stringify(updatesArray, null, 2)};`;
+const fileContent = `// Автогенерируемый файл с обновлениями
+export const updates = ${JSON.stringify(releases, null, 2)};
+`;
 
-  fs.writeFileSync("src/updates.jsx", content, "utf-8");
-  console.log("✅ src/updates.jsx обновлён!");
-}
+fs.writeFileSync(outputFile, fileContent, "utf8");
 
-generateUpdates();
+console.log(`✅ Файл обновлений создан: ${outputFile}`);
