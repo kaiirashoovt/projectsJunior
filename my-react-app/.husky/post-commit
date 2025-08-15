@@ -2,7 +2,7 @@
 # Получаем сообщение последнего коммита
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
-# Запускаем Node.js скрипт
+# Запускаем Node.js скрипт (обновление src/updates.jsx)
 node generateUpdates.cjs "$COMMIT_MSG"
 
 # Добавляем src/updates.jsx в индекс
