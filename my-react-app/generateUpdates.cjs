@@ -1,40 +1,33 @@
 // generateUpdates.cjs
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
-const updatesFile = path.join(__dirname, "src", "updates.jsx");
+const updatesFile = path.resolve("src/updates.jsx");
 
-// Берём сообщение коммита из аргументов
-const commitMessage = process.argv[2] || "Обновления";
+// Получаем сообщение коммита из аргумента
+const commitMessage = process.argv[2] || "Без сообщения";
 
-// Читаем старые обновления
-let oldUpdates = [];
+// Читаем старый файл, если есть
+let oldData = [];
 if (fs.existsSync(updatesFile)) {
-  const content = fs.readFileSync(updatesFile, "utf8");
+  const content = fs.readFileSync(updatesFile, "utf-8");
   try {
-    oldUpdates = eval(content.match(/export const updates = (\[.*\]);/s)[1]);
+    oldData = JSON.parse(content.replace(/export const updates = /, "").replace(/;/, ""));
   } catch {}
 }
 
-// Авто-генерация версии
-const lastVersion = oldUpdates[0]?.version || "v1.0.0";
-const [major, minor, patch] = lastVersion.slice(1).split(".").map(Number);
-const newVersion = `v${major}.${minor}.${patch + 1}`;
-
-const today = new Date().toISOString().split("T")[0];
-
-const newUpdate = {
-  date: today,
-  version: newVersion,
-  changes: [commitMessage],
+// Создаём новый блок
+const newBlock = {
+  date: new Date().toISOString().split("T")[0],
+  version: `v1.0.${oldData.length + 1}`,
+  changes: [commitMessage]
 };
 
-// Добавляем сверху
-const newUpdates = [newUpdate, ...oldUpdates];
+// Добавляем в начало
+const newData = [newBlock, ...oldData];
 
-const fileContent = `export const updates = ${JSON.stringify(newUpdates, null, 2)};`;
-
-// Сохраняем с LF
-fs.writeFileSync(updatesFile, fileContent.replace(/\r\n/g, "\n"));
+// Записываем обратно
+const content = `export const updates = ${JSON.stringify(newData, null, 2)};`;
+fs.writeFileSync(updatesFile, content, "utf-8");
 
 console.log("✅ src/updates.jsx обновлён");
