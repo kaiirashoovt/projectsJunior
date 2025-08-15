@@ -3,3 +3,4 @@
 
 npm run updates
 git add src/updates.jsx
+git commit --amend --no-edit
