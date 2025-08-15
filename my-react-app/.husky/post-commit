@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run updates
-git add src/updates.jsx
-git commit --amend --no-edit
+node generateUpdates.cjs
