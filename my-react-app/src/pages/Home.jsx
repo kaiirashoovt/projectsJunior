@@ -12,7 +12,6 @@ export default function Home() {
   const releases = [
     { version: "v1.2.0", date: "14.08.2025", changes: "Добавлены новые виджеты и улучшен интерфейс" },
     { version: "v1.1.5", date: "05.08.2025", changes: "Исправлены ошибки в анимациях" },
-    { version: "v1.1.0", date: "25.07.2025", changes: "Обновлён дизайн главной страницы" },
   ];
 
   return (
