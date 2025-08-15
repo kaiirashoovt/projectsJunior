@@ -48,7 +48,7 @@ export default function Home() {
       >
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacitцy: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
           <strong>Kokonai Hub</strong> — это не просто сайт, а будущий (если повезёт 🤞) стартап,
@@ -100,7 +100,7 @@ export default function Home() {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.6 }}
-        className="mt-10 relative group"
+        className="mt-10 relative group"  
       >
         <img
           src="/logo-var-1.png"
