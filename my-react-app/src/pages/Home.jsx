@@ -3,30 +3,42 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import MagicBento from "../components/MagicBento";
-import BottomMenu from "../components/BottomMenu";
+import { useTracking } from "../hooks/useTracking";
 import { updates } from "../updates";
+
+
 export default function Home() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const releases = [
-    { version: "v1.2.0", date: "14.08.2025", changes: "Добавлены новые виджеты и улучшен интерфейс" },
-  ];
+
+  useTracking("/home");
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex">
+      
       {/* Основная зона */}
       <main className="flex-1 flex flex-col mt-18">
         {/* Приветствие */}
         <section className="py-10 text-center">
-          <h2 className="text-3xl font-bold mb-2">Привет, гость! 👋</h2>
-          <p className="text-gray-400">
-            Добро пожаловать на наш проект. Здесь вы найдёте всё самое интересное!
-          </p>
-        </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center">
+            <div>
+              <img src="./logo-var-1.svg"></img>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Привет, гость! 👋</h2>
+              <p className="text-gray-400">
+                Добро пожаловать на наш проект. Здесь вы найдёте всё самое интересное!
+              </p>
+            </div>
+          </div>
 
-        {/* MagicBento */}
-        <section className="flex-1 flex flex-col items-center justify-center">
+        </section>
+        <hr className="text-gray-700"/>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-10">
+          <div></div>
           <MagicBento
             textAutoHide={true}
             enableStars={true}
@@ -40,6 +52,7 @@ export default function Home() {
             glowColor="85, 0, 255"
           />
         </section>
+        
 
         {/* Места для будущих виджетов */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-10">
@@ -52,6 +65,25 @@ export default function Home() {
             <p className="text-gray-400">Последние публикации и обновления.</p>
           </div>
         </section>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-10">
+          <MagicBento
+            textAutoHide={true}
+            enableStars={true}
+            enableSpotlight={true}
+            enableBorderGlow={true}
+            enableTilt={true}
+            enableMagnetism={true}
+            clickEffect={true}
+            spotlightRadius={300}
+            particleCount={12}
+            glowColor="85, 0, 255"
+          />
+          <div className="bg-gray-800/40 rounded-2xl p-6 border border-gray-700">
+            <h3 className="text-lg font-semibold mb-2">📰 Новости</h3>
+            <p className="text-gray-400">Последние публикации и обновления.</p>
+          </div>
+        </section>
+        
 
         {/* <BottomMenu /> */}
       </main>

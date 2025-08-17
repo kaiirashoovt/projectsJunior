@@ -12,6 +12,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
 from datetime import datetime
 from typing import Optional
+from sqlalchemy.orm import Session
 
 
 import os
@@ -92,6 +93,17 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     bio: Optional[str] = None
     avatarurl: Optional[str] = None
+
+
+
+class VisitLog(Base):
+    __tablename__ = "visit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ip = Column(String, index=True)
+    user_agent = Column(String)
+    page_url = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
 # ---------------------- Утилиты ----------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -252,3 +264,16 @@ async def update_user_by_email(
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+@app.post("/api/track")
+async def track_visit(request: Request, db: Session = Depends(get_db)):
+    body = await request.json()
+    page_url = body.get("page_url", "/")
+
+    ip = request.client.host
+    user_agent = request.headers.get("user-agent")
+
+    log = VisitLog(ip=ip, user_agent=user_agent, page_url=page_url)
+    db.add(log)
+    db.commit()
+    return {"status": "ok"}
