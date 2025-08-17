@@ -81,7 +81,7 @@ function AppWrapper() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/welcome" element={<WelcomePage />} />
+          {/* <Route path="/welcome" element={<WelcomePage />} /> */}
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
