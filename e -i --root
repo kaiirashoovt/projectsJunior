@@ -1,0 +1,101 @@
+[33m4f9a64e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m fix: remove secrets
+[33m13532c0[m 11.05.2026 2.0
+[33mda8cd02[m 11.05.2026
+[33m628fb23[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m WelcomePage deleted
+[33me930912[m 	modified:   backend/__pycache__/main.cpython-312.pyc 	modified:   backend/main.py 	new file:   my-react-app/generateUpdates.js 	deleted:    my-react-app/generateUpdates.mjs 	modified:   my-react-app/package.json 	modified:   my-react-app/src/App.jsx 	new file:   my-react-app/src/hooks/useTracking.jsx 	modified:   my-react-app/src/pages/About.jsx 	modified:   my-react-app/src/pages/Home.jsx 	modified:   my-react-app/src/pages/Login.jsx 	modified:   my-react-app/src/pages/Profile.jsx 	modified:   my-react-app/src/pages/Register.jsx 	new file:   my-react-app/src/pages/adminPages/Dashboard.jsx 	modified:   my-react-app/src/updates.jsx 	new file:   my-react-app/version.json
+[33me231e3a[m Первый тест автогенерации
+[33mf52be3d[m Первый тест автогенерации 2
+[33mab75913[m Первый тест автогенерации 2
+[33m0aa02dc[m Первый тест автогенерации
+[33mf520028[m Первый тест автогенерации
+[33m7daab44[m Тест автогенерации
+[33mca08d14[m Тест автогенерации
+[33mbd082e4[m Тест автогенерации через Husky
+[33mf1c6cc5[m Тест автогенерации
+[33m59994f4[m Тест автогенерации
+[33m62a140c[m Тест автогенерации
+[33md098e2a[m Тест автогенерации через Husky
+[33m32ffb7e[m Тест автогенерации через Husky
+[33m3d9c911[m Тест автогенерации через Husky
+[33mfcfbd69[m Тест автогенерации
+[33m741eca7[m Добавлен post-commit hook для обновлений
+[33m9822f6a[m Тест автогенерации через Husky
+[33m60c3429[m Тест автогенерации
+[33mda476e3[m Тест автогенерации
+[33mecc78ce[m Первый тест автогенерации
+[33mf2310d7[m Тест post-commit hook
+[33maa36c53[m Первый тест автогенерации
+[33mf4633ed[m Тест post-commit
+[33md600c86[m Тест автогенерации changelog
+[33m8602367[m Тест автогенерации changelog
+[33m5c7e639[m Тест автогенерации changelog
+[33m8567102[m Тест автогенерации changelog
+[33me550597[m Добавлен новый компонент
+[33m3724d38[m Добавлен новый компонент
+[33m07828d0[m Тест post-commit
+[33m43f9040[m Тест автогенерации changelog
+[33madae003[m Проверка husky hook
+[33m5807bcd[m Добавлено новый компонент 'Журнал обновлений'
+[33m89f4031[m Добавлено новый компонент 'Журнал обновлений'
+[33m398c1cc[m Добавлено новый компонент 'Журнал обновлений'
+[33m9aea52e[m Добавлено новый компонент 'Журнал обновлений'
+[33m93d20ad[m commit reales 0.0.2
+[33me004ecc[m test 9
+[33mea538d3[m fullname
+[33m26af2d7[m avatarurl and fullname edited
+[33mcf4db60[m fullName =>> fullname
+[33ma8cb477[m user@example.com
+[33m217d30c[m fixed main.py 2
+[33md83ce30[m fixed main.py
+[33m69cbf99[m fixed bag
+[33m790a60d[m @app.get("/") async def root():     return {"status": "ok"}
+[33m2df0e70[m mapping func
+[33ma522c79[m test 9
+[33m3632043[m fixed user_update
+[33mdc61f45[m test 8
+[33mae0da11[m test 7
+[33m03d850b[m user_update
+[33mb062bf5[m Profile fixed 2
+[33mfc045cb[m prifile fixed
+[33m7b070c6[m edited more
+[33m7c3a9e8[m Notify added
+[33m25c7f0e[m test 6
+[33m3105165[m test 5
+[33m15a7bb7[m added botton LogOut
+[33m086ce84[m test 4
+[33m7b0338e[m pip install asyncpg
+[33m9aac231[m 12312312312
+[33m9c97a90[m +asyncpg:
+[33ma2fd329[m test 2
+[33m09f4d66[m test
+[33mc997cf0[m isAuthenticated
+[33m7f069e3[m 	modified:   backend/main.py 	modified:   my-react-app/src/App.jsx 	new file:   my-react-app/src/auth/PrivateRoute.jsx 	new file:   my-react-app/src/auth/isAuthenticated.jsx
+[33md1a55bb[m pwd_context.hash
+[33m567bcc1[m from typing import List
+[33mc4fdd5b[m 123
+[33m3a4edf9[m         console.error("Ошибка при логине:", data.detail || data.message || data);
+[33me50bcb8[m console.error
+[33me8d695c[m modified:   backend/main.py
+[33mc6e1b66[m https://my-fastapi-backend-f4e2.onrender.com/
+[33m5710746[m email-validator==2.2.0
+[33m14c0eb5[m python-jose
+[33mb65c421[m passlib==1.7.4
+[33m2c528c6[m gunicorn==20.1.0
+[33m45ebd0e[m fastapi==0.116.1 uvicorn==0.35.0 python-dotenv==1.1.1 pydantic==2.11.7 bcrypt==4.3.0 requests==2.32.3 sqlalchemy==2.0.19 typing-extensions==4.12.2
+[33mb6048dc[m pillow==9.5.0
+[33m934ed57[m pip freeze > requirements.txt
+[33m940f9a7[m pip freeze > requirements.txt
+[33m526dd35[m test requirements
+[33m64081e3[m Добавил backend как часть основного репозитория
+[33m2c94b8a[m Добавляю backend как обычную папку
+[33m3d143d0[m Удалил backend из .gitmodules
+[33m23fe4a4[m Убрал подмодуль backend, добавил как обычную папку
+[33md02fd02[m test
+[33m9dcdc1a[m feat(auth): добавить страницу регистрации и улучшить страницу входа 3
+[33m939ec8c[m feat(auth): добавить страницу регистрации и улучшить страницу входа 2
+[33me610334[m feat(auth): добавить страницу регистрации и улучшить страницу входа
+[33m79fd68f[m /test vite
+[33me7b1bfb[m test preview
+[33m71cb91a[m just
+[33m346ba6f[m edit package json file
+[33mf2e772c[m first commit
