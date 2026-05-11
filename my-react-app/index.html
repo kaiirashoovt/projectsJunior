@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/logo-var-1.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kokonai Hub</title>
+    <script>
+    (function() {
+      try {
+        const stored = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored ?? (systemDark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      } catch (_) {}
+    })();
+    </script>
+
   </head>
   <body>
     <div id="root" ></div>

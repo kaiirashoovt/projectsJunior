@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 export function useTracking(pageUrl) {
   useEffect(() => {
+    console.log("Log")
     fetch("https://my-fastapi-backend-f4e2.onrender.com/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

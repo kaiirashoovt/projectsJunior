@@ -13,7 +13,7 @@ from sqlalchemy.future import select
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-
+from openai import AsyncOpenAI
 
 import os
 
@@ -38,6 +38,11 @@ if not DATABASE_URL:
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY не установлен в переменных окружения!")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY не установлен в переменных окружения!")
+
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
@@ -104,6 +109,9 @@ class VisitLog(Base):
     user_agent = Column(String)
     page_url = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+class ChatRequest(BaseModel):
+    message: str
 # ---------------------- Утилиты ----------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -265,7 +273,7 @@ async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-@app.post("/api/track")
+@app.post("api/track")
 async def track_visit(request: Request, db: Session = Depends(get_db)):
     body = await request.json()
     page_url = body.get("page_url", "/")
@@ -277,3 +285,27 @@ async def track_visit(request: Request, db: Session = Depends(get_db)):
     db.add(log)
     db.commit()
     return {"status": "ok"}
+
+
+client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",  # оптимальная по цене/качеству модель
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Ты — Каирашов Мухамедали (Али), программист. "
+                               "Отвечай дружелюбно, рассказывай о проектах, технологиях, опыте."
+                },
+                {"role": "user", "content": req.message}
+            ],
+            max_tokens=500
+        )
+
+        return {"reply": response.choices[0].message.content}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

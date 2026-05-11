@@ -63,7 +63,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       {/* Левая часть с приветствием */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-teal-900 via-cyan-800 to-gray-900 text-white items-center justify-center relative">
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-t from-teal-950 via-cyan-1000 to-slate-950 text-white  items-center justify-center relative">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ export default function Login() {
       </div>
 
       {/* Правая часть с формой */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center bg-gray-900 px-6">
+      <div className="flex w-full lg:w-1/2 items-center justify-center bg-gradient-to-t from-teal-950 via-cyan-1000 to-slate-950 text-white px-6">
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}

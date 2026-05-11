@@ -56,7 +56,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-900 via-cyan-800 to-gray-900 text-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-l from-teal-950 via-cyan-900 to-slate-950 text-white px-4">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

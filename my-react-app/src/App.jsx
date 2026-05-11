@@ -8,7 +8,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Error from "./pages/Error";
-import PrivateRoute from "./auth/PrivateRoute"
 import { isAuthenticated } from "./auth/isAuthenticated";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
