@@ -1,26 +1,28 @@
 import { useState } from "react";
-import {Bot} from "lucide-react"
+import { Bot, Loader2, Send } from "lucide-react";
 import { sendChatMessage } from "../shared/api/chat";
+
 export default function ChatBox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSend = async () => {
-    if (input.trim() === "") return;
+  const handleSend = async (event) => {
+    event?.preventDefault();
+    const message = input.trim();
+    if (!message || loading) return;
 
-    const newMessage = { text: input, sender: "You" };
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => [...prev, { text: message, sender: "user" }]);
     setInput("");
     setLoading(true);
 
     try {
-      const data = await sendChatMessage(input);
-      setMessages((prev) => [...prev, { text: data.reply, sender: "Bot" }]);
+      const data = await sendChatMessage(message);
+      setMessages((prev) => [...prev, { text: data.reply, sender: "bot" }]);
     } catch {
       setMessages((prev) => [
         ...prev,
-        { text: "Ошибка соединения с сервером", sender: "System" },
+        { text: "Не удалось связаться с сервером.", sender: "system" },
       ]);
     } finally {
       setLoading(false);
@@ -28,55 +30,60 @@ export default function ChatBox() {
   };
 
   return (
-    <div className="bg-gray-800/40 rounded-2xl p-6 border border-gray-700">
-      {/* Заголовок */}
-      <div className="text-center mb-3">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <Bot className="w-5 h-5" /> AI Чат
-        </h2>        
-        <p className="text-xs text-gray-400">Попробуй пообщаться с ботом</p>
-      </div>
+    <section className="flex h-full min-h-[28rem] flex-col rounded-lg border border-white/10 bg-white/[0.04] p-5">
+      <header className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Bot className="h-5 w-5 text-cyan-200" />
+          <h2 className="text-lg font-semibold text-white">AI чат</h2>
+        </div>
+        <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100">
+          beta
+        </span>
+      </header>
 
-      {/* Сообщения */}
-      <div className="flex-1 overflow-y-auto mb-4 max-h-80 pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         {messages.length === 0 ? (
-          <p className="text-gray-500 text-center italic">Нет сообщений</p>
+          <div className="flex h-full min-h-48 items-center justify-center text-center text-sm text-slate-500">
+            Напиши вопрос, и ответ появится здесь.
+          </div>
         ) : (
-          messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`p-3 my-2 rounded-xl max-w-[80%] break-words shadow-sm text-sm ${
-                msg.sender === "You"
-                  ? "bg-cyan-600 text-white ml-auto rounded-br-none"
-                  : msg.sender === "Bot"
-                  ? "bg-gray-800 text-cyan-200 mr-auto rounded-bl-none"
-                  : "bg-red-800/70 text-red-200 mr-auto rounded-bl-none"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))
+          <div className="space-y-3">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`max-w-[86%] rounded-lg px-3 py-2 text-sm leading-6 ${
+                  message.sender === "user"
+                    ? "ml-auto bg-cyan-400 text-slate-950"
+                    : message.sender === "bot"
+                      ? "bg-black/25 text-cyan-100"
+                      : "bg-red-500/15 text-red-100"
+                }`}
+              >
+                {message.text}
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Поле ввода */}
-      <div className="flex gap-2">
+      <form onSubmit={handleSend} className="mt-4 flex gap-2">
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 bg-gray-800 text-gray-200 border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          placeholder="Введите сообщение..."
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          onChange={(event) => setInput(event.target.value)}
+          className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/50"
+          placeholder="Введите сообщение"
         />
         <button
-          onClick={handleSend}
-          disabled={loading}
-          className="bg-cyan-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow hover:bg-cyan-500 transition disabled:opacity-50"
+          type="submit"
+          disabled={loading || !input.trim()}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-400 text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Отправить сообщение"
+          title="Отправить"
         >
-          {loading ? "..." : "➤"}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </button>
-      </div>
-    </div>
+      </form>
+    </section>
   );
 }

@@ -4,34 +4,33 @@ import Widget from "./Widget";
 
 export default function TasksWidget() {
   const [tasks, setTasks] = useState([
-    { id: 1, text: "Закончить отчёт", done: false },
-    { id: 2, text: "Проверить почту", done: true },
-    { id: 3, text: "Созвон с клиентом", done: false },
+    { id: 1, text: "Проверить профиль и авторизацию", done: true },
+    { id: 2, text: "Причесать главную страницу", done: false },
+    { id: 3, text: "Добавить миграции backend", done: false },
   ]);
 
   const toggleTask = (id) => {
     setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, done: !t.done } : t
-      )
+      prev.map((task) => (task.id === id ? { ...task, done: !task.done } : task))
     );
   };
 
   return (
     <Widget icon={CheckSquare} title="Задачи">
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {tasks.map((task) => (
-          <li
-            key={task.id}
-            className="flex items-center gap-2 bg-gray-700/30 p-2 rounded-lg"
-          >
+          <li key={task.id} className="flex items-start gap-3">
             <input
               type="checkbox"
               checked={task.done}
               onChange={() => toggleTask(task.id)}
-              className="accent-blue-500"
+              className="mt-1 h-4 w-4 accent-cyan-400"
             />
-            <span className={task.done ? "line-through text-gray-500" : "text-white"}>
+            <span
+              className={`text-sm leading-6 ${
+                task.done ? "text-slate-500 line-through" : "text-slate-200"
+              }`}
+            >
               {task.text}
             </span>
           </li>
