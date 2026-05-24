@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { isAuthenticated } from "../auth/isAuthenticated";
-import { Sun, Moon } from 'lucide-react';
-import { useTheme } from '../hooks/useTheme';
+import { logoutUser } from "../shared/api/auth";
 
 export default function Navbar({ user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const [auth, setAuth] = useState(false);
   const location = useLocation();
-  const token = localStorage.getItem("token");
-  const { theme, toggle } = useTheme();
+  const navigate = useNavigate();
 
   const commonMenuItems = [
     { to: "/", label: "Главная" },
@@ -26,34 +25,51 @@ export default function Navbar({ user, onLogout }) {
       const result = await isAuthenticated();
       setAuth(result);
     }
+
     checkAuth();
-  }, []);
+  }, [location.pathname]);
+
+  async function handleLogout() {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Ошибка logout:", error);
+    } finally {
+      setAuth(false);
+      setIsOpen(false);
+      onLogout?.();
+      navigate("/login");
+      toast.info("Вы вышли!", {
+        className: "bg-green-600 text-white font-bold",
+        bodyClassName: "text-sm",
+        progressClassName: "bg-white",
+      });
+    }
+  }
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-white/5 border-b border-white/10">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-      <Link
-        to="/"
-        className="group flex items-center gap-2 text-2xl font-semibold tracking-wide text-white transition-colors"
-      >
-        <svg
-          viewBox="0 0 1600 200"
-          className="w-60 h-12 transition-transform duration-200 group-hover:scale-110"
-          aria-label="Kokonai Hub logo"
+        <Link
+          to="/"
+          className="group flex items-center gap-2 text-2xl font-semibold tracking-wide text-white transition-colors"
         >
-          <image
-            href="/logo-var-1.png"
-            x="0"
-            y="0"
-            width="1600"
-            height="200"
-            preserveAspectRatio="xMidYMid slice"
-            className="transition-filter duration-200 group-hover:brightness-110"
-          />
-        </svg>
-      </Link>
-
-
+          <svg
+            viewBox="0 0 1600 200"
+            className="w-60 h-12 transition-transform duration-200 group-hover:scale-110"
+            aria-label="Kokonai Hub logo"
+          >
+            <image
+              href="/logo-var-1.png"
+              x="0"
+              y="0"
+              width="1600"
+              height="200"
+              preserveAspectRatio="xMidYMid slice"
+              className="transition-filter duration-200 group-hover:brightness-110"
+            />
+          </svg>
+        </Link>
 
         <div className="hidden md:flex gap-8 items-center">
           {commonMenuItems.map((item) => (
@@ -80,31 +96,7 @@ export default function Navbar({ user, onLogout }) {
             <div className="flex items-center gap-4 text-white">
               <span>Привет, {user?.name || "User"}</span>
               <button
-                onClick={async () => {
-                      try {
-                        const response = await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/logout", {
-                          method: "POST",
-                          headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                          }
-                        });
-                
-                        if (!response.ok) {
-                          console.warn("Ошибка при logout:", response.status);
-                        }
-                      } catch (error) {
-                        console.error("Ошибка logout:", error);
-                      } finally {
-                        localStorage.removeItem("token");
-                        navigate("/login");
-                        toast.info("Вы вышли!", {
-                          className: "bg-green-600 text-white font-bold",
-                          bodyClassName: "text-sm",
-                          progressClassName: "bg-white"
-                        });
-                      }
-                    }}
+                onClick={handleLogout}
                 className="text-indigo-400 hover:text-indigo-600 transition-colors text-left"
               >
                 Выйти
@@ -137,6 +129,7 @@ export default function Navbar({ user, onLogout }) {
             ✕
           </button>
         </div>
+
         <nav className="flex flex-col gap-4 p-6 text-white">
           {commonMenuItems.map((item) => (
             <Link
@@ -163,31 +156,7 @@ export default function Navbar({ user, onLogout }) {
             <div className="flex flex-col gap-2 mt-4">
               <span>Привет, {user?.name || "User"}</span>
               <button
-                onClick={async () => {
-                      try {
-                        const response = await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/logout", {
-                          method: "POST",
-                          headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                          }
-                        });
-                
-                        if (!response.ok) {
-                          console.warn("Ошибка при logout:", response.status);
-                        }
-                      } catch (error) {
-                        console.error("Ошибка logout:", error);
-                      } finally {
-                        localStorage.removeItem("token");
-                        navigate("/login");
-                        toast.info("Вы вышли!", {
-                          className: "bg-green-600 text-white font-bold",
-                          bodyClassName: "text-sm",
-                          progressClassName: "bg-white"
-                        });
-                      }
-                    }}
+                onClick={handleLogout}
                 className="text-indigo-400 hover:text-indigo-600 transition-colors text-left"
               >
                 Выйти

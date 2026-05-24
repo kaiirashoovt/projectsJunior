@@ -12,12 +12,13 @@ import { isAuthenticated } from "./auth/isAuthenticated";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation } from 'react-router-dom';
+import { getAuthToken, logoutUser } from "./shared/api/auth";
 
 // import { FaDiscord } from "react-icons/fa";
 import {HomeIcon,Archive,User,Settings,Github,LogOut } from "lucide-react";
 
 function AppWrapper() {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
   const location = useLocation();
   const navigate = useNavigate();
   const items = [
@@ -31,7 +32,6 @@ function AppWrapper() {
 
           navigate("/profile");
         } else {
-          console.log(auth)
           toast.error("Сначала авторизуйтесь");
           navigate("/login");
         }
@@ -48,21 +48,10 @@ function AppWrapper() {
     label: "Выйти",
     onClick: async () => {
       try {
-        const response = await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/logout", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          console.warn("Ошибка при logout:", response.status);
-        }
+        await logoutUser();
       } catch (error) {
         console.error("Ошибка logout:", error);
       } finally {
-        localStorage.removeItem("token");
         navigate("/login");
         toast.info("Вы вышли!", {
           className: "bg-green-600 text-white font-bold",

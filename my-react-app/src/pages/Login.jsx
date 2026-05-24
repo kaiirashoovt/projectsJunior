@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
+import { loginUser } from "../shared/api/auth";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -32,25 +33,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        "https://my-fastapi-backend-f4e2.onrender.com/api/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.detail || errorData.message || "Ошибка авторизации"
-        );
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-
+      await loginUser(form);
       toast.success("Вы успешно вошли!");
       navigate("/profile");
     } catch (err) {

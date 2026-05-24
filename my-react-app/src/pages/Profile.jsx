@@ -3,21 +3,8 @@ import { Settings, CircleUserRound } from "lucide-react";
 import { motion } from "framer-motion";
 import Tiptap from "../components/TipTap";
 import { Loader2 } from "lucide-react";
-
-async function getUserIdFromToken() {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
-
-  try {
-    const mod = await import("jwt-decode");
-    const decodeFunc = mod.jwtDecode;
-    const decoded = decodeFunc(token);
-    return decoded.sub || null;
-  } catch (e) {
-    console.error("Ошибка декодирования токена:", e);
-    return null;
-  }
-}
+import { getCurrentUserEmail } from "../shared/api/auth";
+import { getUserByEmail, updateUserByEmail } from "../shared/api/users";
 
 function ProfilePage() {
   const [user_email, setUserEmail] = useState(null);
@@ -41,8 +28,8 @@ function ProfilePage() {
   }, [formData.bio, isEditing]);
 
   useEffect(() => {
-    async function loadUserEmail() {
-      const email = await getUserIdFromToken();
+    function loadUserEmail() {
+      const email = getCurrentUserEmail();
       if (email) {
         setUserEmail(email);
       } else {
@@ -58,18 +45,14 @@ function ProfilePage() {
     async function fetchUser() {
       setLoading(true);
       try {
-        const res = await fetch(
-          `https://my-fastapi-backend-f4e2.onrender.com/api/users/${user_email}`
-        );
-        if (!res.ok) throw new Error("Не удалось загрузить профиль");
-        const data = await res.json();
+        const data = await getUserByEmail(user_email);
         setUser(data);
         setFormData({
           fullname: data.fullname || "",
           email: data.email || "",
           phone: data.phone || "",
           bio: data.bio || "",
-          avatarUrl: data.avatarurl || "",
+          avatarUrl: data.avatarUrl || "",
         });
         setError(null);
       } catch (e) {
@@ -92,16 +75,7 @@ function ProfilePage() {
     setError(null);
     try {
       const updatedData = { ...formData, bio: bioDraft };
-      const res = await fetch(
-        `https://my-fastapi-backend-f4e2.onrender.com/api/user_update/${user_email}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
-        }
-      );
-      if (!res.ok) throw new Error("Ошибка при сохранении");
-      const updatedUser = await res.json();
+      const updatedUser = await updateUserByEmail(user_email, updatedData);
       setUser(updatedUser);
       setEditing(false);
     } catch (e) {

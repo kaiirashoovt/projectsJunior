@@ -1,12 +1,8 @@
 import { useEffect } from "react";
+import { trackVisit } from "../shared/api/tracking";
 
 export function useTracking(pageUrl) {
   useEffect(() => {
-    console.log("Log")
-    fetch("https://my-fastapi-backend-f4e2.onrender.com/api/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ page_url: pageUrl }),
-    }).catch((err) => console.error("Tracking error:", err));
+    trackVisit(pageUrl).catch((err) => console.error("Tracking error:", err));
   }, [pageUrl]);
 }

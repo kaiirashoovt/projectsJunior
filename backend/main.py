@@ -1,18 +1,15 @@
-from fastapi import FastAPI, HTTPException, Depends,Request,Path
+from fastapi import FastAPI, HTTPException, Depends, Request, Path
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
+from typing import List, Optional
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
-from datetime import datetime
-from typing import Optional
-from sqlalchemy.orm import Session
 from openai import AsyncOpenAI
 
 import os
@@ -97,7 +94,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     bio: Optional[str] = None
-    avatarurl: Optional[str] = None
+    avatarUrl: Optional[str] = None
 
 
 
@@ -112,6 +109,16 @@ class VisitLog(Base):
     
 class ChatRequest(BaseModel):
     message: str
+
+def serialize_user(user: User) -> dict:
+    return {
+        "email": user.email,
+        "fullname": user.fullname,
+        "phone": user.phone,
+        "bio": user.bio,
+        "avatarUrl": user.avatarurl,
+    }
+
 # ---------------------- Утилиты ----------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -198,7 +205,7 @@ async def logout(request: Request):
 async def get_users(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User))
     users = result.scalars().all()
-    return users
+    return [serialize_user(user) for user in users]
 
 @app.get("/api/users/{user_email}", response_model=UserOut)
 async def get_user_by_email(
@@ -210,15 +217,7 @@ async def get_user_by_email(
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     
-    # Для адаптации имён из модели User в Pydantic
-    user_data = {
-        "email": user.email,
-        "fullname": user.fullname,
-        "phone": user.phone,
-        "bio": user.bio,
-        "avatarUrl": user.avatarurl,
-    }
-    return user_data
+    return serialize_user(user)
 
 @app.put("/api/user_update/{user_email}", response_model=UserOut)
 async def update_user_by_email(
@@ -245,15 +244,11 @@ async def update_user_by_email(
         "avatarUrl": "avatarurl",
     }
 
-    data = user_update.dict(exclude_unset=True)
+    data = user_update.model_dump(exclude_unset=True)
     data = {k: v for k, v in data.items() if v is not None and v != ""}
-
-    print("Обновляем пользователя:", user.email)
-    print("Данные для обновления:", data)
 
     for field, value in data.items():
         orm_field = field_map.get(field)
-        print(f"Обновляем поле {orm_field} значением {value}")
         if orm_field:
             setattr(user, orm_field, value)
 
@@ -265,7 +260,7 @@ async def update_user_by_email(
         print("Ошибка при сохранении:", e)
         raise HTTPException(status_code=500, detail="Ошибка обновления пользователя")
 
-    return user
+    return serialize_user(user)
 
 # ---------------------- Создание таблиц при старте ----------------------
 @app.on_event("startup")
@@ -273,8 +268,8 @@ async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-@app.post("api/track")
-async def track_visit(request: Request, db: Session = Depends(get_db)):
+@app.post("/api/track")
+async def track_visit(request: Request, db: AsyncSession = Depends(get_db)):
     body = await request.json()
     page_url = body.get("page_url", "/")
 
@@ -283,7 +278,7 @@ async def track_visit(request: Request, db: Session = Depends(get_db)):
 
     log = VisitLog(ip=ip, user_agent=user_agent, page_url=page_url)
     db.add(log)
-    db.commit()
+    await db.commit()
     return {"status": "ok"}
 
 

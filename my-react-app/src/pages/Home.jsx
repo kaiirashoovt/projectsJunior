@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import MagicBento from "../components/MagicBento";
 import { useTracking } from "../hooks/useTracking";
 import { updates } from "../updates";
-import { Sun, Moon,Newspaper,ChartSpline } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
 import StatsWidget from "../components/StatsWidget";
 import NewsWidget from "../components/NewsWidget";
 import CalendarWidget from "../components/CalendarWidget";
@@ -14,7 +11,6 @@ import TasksWidget from "../components/TasksWidget";
 import ChatBox from "../components/ChatBox";
 
 export default function Home() {
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   // const [theme, setTheme] = useTheme();
 

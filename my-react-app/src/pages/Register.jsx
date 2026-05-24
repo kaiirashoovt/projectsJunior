@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import { Loader2, Mail, Lock } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
+import { registerUser } from "../shared/api/auth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -22,25 +23,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://my-fastapi-backend-f4e2.onrender.com/api/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Ошибка регистрации");
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-
+      await registerUser({ email, password });
       toast.success("Регистрация прошла успешно!", {
         className: "bg-green-600 text-white font-bold",
         bodyClassName: "text-sm",

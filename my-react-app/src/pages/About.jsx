@@ -1,6 +1,4 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { HomeIcon, Archive, User, Settings, Github } from "lucide-react";
 
 // Варианты для контейнера (staggerChildren делает задержку автоматически)
 const containerVariants = {
@@ -25,8 +23,6 @@ const features = [
 ];
 
 export default function Home() {
-  const navigate = useNavigate();
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center px-6 py-10">
       

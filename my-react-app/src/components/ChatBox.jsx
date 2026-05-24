@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {Bot} from "lucide-react"
+import { sendChatMessage } from "../shared/api/chat";
 export default function ChatBox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -14,17 +15,9 @@ export default function ChatBox() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://my-fastapi-backend-f4e2.onrender.com/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
-      });
-
-      if (!res.ok) throw new Error("Ошибка запроса");
-
-      const data = await res.json();
+      const data = await sendChatMessage(input);
       setMessages((prev) => [...prev, { text: data.reply, sender: "Bot" }]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { text: "Ошибка соединения с сервером", sender: "System" },
