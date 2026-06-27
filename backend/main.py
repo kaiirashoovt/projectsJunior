@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Request, Path
+from groq import AsyncGroq  # ← ИЗМЕНЕНО: AsyncGroq вместо Groq
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import jwt
@@ -10,24 +11,37 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
-from openai import AsyncOpenAI
+from sqlalchemy.exc import IntegrityError
+
 
 import os
+
+load_dotenv()
+
+
+def get_cors_origins() -> list[str]:
+    origins = os.getenv("CORS_ORIGINS")
+    if origins:
+        return [origin.strip() for origin in origins.split(",") if origin.strip()]
+
+    return [
+        "https://kokonai-hub.vercel.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
 
 # ---------------------- Инициализация приложения ----------------------
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://kokonai-hub.vercel.app", "http://localhost:5173"],
+    allow_origins=get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ---------------------- Настройки и подключение к БД ----------------------
-load_dotenv()
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL не установлен в переменных окружения!")
@@ -36,10 +50,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY не установлен в переменных окружения!")
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY не установлен в переменных окружения!")
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    raise RuntimeError("GROQ_API_KEY не установлен в переменных окружения!")
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
@@ -49,6 +62,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 engine = create_async_engine(DATABASE_URL, echo=False, future=True)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
+
+# ← ИЗМЕНЕНО: инициализируем AsyncGroq один раз
+groq_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 async def get_db():
     async with AsyncSessionLocal() as session:
@@ -133,30 +149,73 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # ---------------------- Роуты ----------------------
-@app.post("/api/register")
-async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == user.email))
-    existing_user = result.scalars().first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Пользователь уже существует")
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
-    hashed_password = get_password_hash(user.password)
-    new_user = User(
-        email=user.email,
-        password=hashed_password,
-        name="",  # или user.name, если хочешь из запроса
-        created_at=datetime.utcnow()
+
+
+
+@app.post("/api/register")
+async def register(
+    user: UserCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    # Проверка длины пароля для bcrypt
+    if len(user.password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Пароль должен быть не больше 72 символов"
+        )
+
+    # Проверяем существование пользователя
+    result = await db.execute(
+        select(User).where(User.email == user.email)
     )
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
+
+    existing_user = result.scalars().first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Пользователь уже существует"
+        )
+
+    try:
+        hashed_password = get_password_hash(user.password)
+
+        new_user = User(
+            email=user.email,
+            password=hashed_password,
+            name="",
+            created_at=datetime.utcnow()
+        )
+
+        db.add(new_user)
+
+        await db.commit()
+        await db.refresh(new_user)
+
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="Ошибка сохранения пользователя"
+        )
 
     access_token = create_access_token(
         data={"sub": user.email},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expires_delta=timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
     )
-    return {"token": access_token}
 
+    return {
+        "token": access_token,
+        "user": {
+            "email": new_user.email
+        }
+    }
 
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -282,25 +341,140 @@ async def track_visit(request: Request, db: AsyncSession = Depends(get_db)):
     return {"status": "ok"}
 
 
-client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+@app.get("/api/set_password/{user_email}/{new_password}")
+async def set_password(
+    user_email: str = Path(..., description="Email пользователя"),
+    new_password: str = Path(..., description="Новый пароль"),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.email == user_email))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    if len(new_password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Пароль должен быть не больше 72 символов"
+        )
+
+    hashed_password = get_password_hash(new_password)
+    user.password = hashed_password
+
+    try:
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    except Exception as e:
+        print("Ошибка при сохранении:", e)
+        raise HTTPException(status_code=500, detail="Ошибка обновления пароля")
+
+    return {"status": "ok", "message": "Пароль успешно обновлен"}
+
+
+# ← НОВОЕ: System prompt про портфолио Мухамедали
+CHAT_SYSTEM_PROMPT = """You are an AI assistant representing Muhammadali Kairasov (Ali), a fullstack developer from Semey, Kazakhstan.
+
+YOUR ROLE:
+You help visitors understand Ali's experience, technical skills, and interests. Be friendly, informative, and encouraging.
+
+ABOUT ALI:
+- Professional Experience: 2.5+ years as a fullstack developer
+- Location: Semey, Kazakhstan
+- Education: Bachelor's degree in Computer Engineering (Shakarim University)
+- Focus: Enterprise applications, backend systems, integrations
+
+TECH STACK:
+Backend: Lua, PostgreSQL, REST APIs, FastAPI, Node.js, Go
+Frontend: Angular, TypeScript, React, PrimeNG, Tailwind CSS, Vite
+Tools & Infrastructure: Docker, Git, EDS/Digital Signatures, PDF processing, Groq API
+
+PORTFOLIO PROJECT:
+1. Kokonai Hub - Personal dashboard & portfolio website (React + FastAPI)
+   - Features: User profiles, task/calendar widgets, AI chat assistant
+   - Tech: Vite frontend, async PostgreSQL backend, Groq API integration
+   - Demonstrates: Full-stack development, real-time features, API integration
+
+PROFESSIONAL EXPERIENCE:
+- Enterprise business process automation
+- Backend systems and database optimization
+- API integrations and data synchronization
+- Document processing and workflow management
+- Real-time monitoring and reporting
+- Security and access control implementation
+- Working with PostgreSQL, optimizing queries, managing complex workflows
+
+INTERESTS & EXPERTISE:
+- Building scalable backend systems
+- Database design and optimization (working minutes calculation, complex queries)
+- API design and integration (REST, async operations)
+- Document processing (PDF, digital signatures)
+- AI integration with Groq API
+- Full-stack development with modern frameworks
+
+COMMUNICATION STYLE:
+- Professional but friendly and approachable
+- Direct and concise (max 300 tokens per response)
+- Use Russian when appropriate, English for code/technical terms
+- Provide concrete technical examples
+- Be honest about limitations
+
+INSTRUCTIONS:
+1. Keep responses focused and valuable
+2. Can discuss technical challenges, solution approaches, and architectural decisions
+3. Show genuine interest in what visitor asks
+4. Offer deeper explanations if interested
+5. End with a helpful suggestion or follow-up question when appropriate"""
 
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
+    """
+    AI chat endpoint powered by Groq Llama.
+    Provides information about Ali's projects, experience, and tech skills.
+    """
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o-mini",  # оптимальная по цене/качеству модель
+        # ← ИЗМЕНЕНО: валидация входа
+        if not req.message or len(req.message.strip()) == 0:
+            raise HTTPException(status_code=400, detail="Message cannot be empty")
+        
+        if len(req.message) > 2000:
+            raise HTTPException(status_code=400, detail="Message too long (max 2000 characters)")
+        
+        # ← ИЗМЕНЕНО: используем await для AsyncGroq
+        response = await groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
-                    "content": "Ты — Каирашов Мухамедали (Али), программист. "
-                               "Отвечай дружелюбно, рассказывай о проектах, технологиях, опыте."
+                    "content": CHAT_SYSTEM_PROMPT
                 },
                 {"role": "user", "content": req.message}
             ],
-            max_tokens=500
+            max_tokens=500,
+            temperature=0.7
         )
 
         return {"reply": response.choices[0].message.content}
 
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Chat error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process your message")
+
+
+# ← НОВОЕ: Healthcheck для чата
+@app.get("/api/health/chat")
+async def chat_health():
+    """Check if Groq API is accessible."""
+    try:
+        response = await groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": "hi"}],
+            max_tokens=10
+        )
+        return {"status": "healthy", "model": "llama-3.3-70b-versatile"}
+    except Exception as e:
+        print(f"Groq health check failed: {str(e)}")
+        return {"status": "unhealthy", "error": str(e)}, 503

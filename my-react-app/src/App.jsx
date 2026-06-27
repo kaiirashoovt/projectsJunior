@@ -22,7 +22,7 @@ function AppWrapper() {
   const location = useLocation();
   const navigate = useNavigate();
   const items = [
-    { icon: <HomeIcon color="#ffffffff" size={18} />, label: 'Домой', onClick: () => navigate("/home") },
+    { icon: <HomeIcon color="#ffffffff" size={18} />, label: 'Домой 123', onClick: () => navigate("/home") },
     { icon: <Archive color="#ffffffff" size={18} />, label: 'Архив', onClick: () => alert('Ведутся технические работы!') },
     { icon: <User  color="#ffffffff" size={18} />, label: 'Профиль', onClick: async () => {
         const auth = await isAuthenticated();

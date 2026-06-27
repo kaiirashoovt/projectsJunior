@@ -107,7 +107,11 @@ export default function Login() {
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Войти"}
             </button>
           </form>
-
+          <p className="mt-6 text-sm text-gray-400 text-center">
+            <Link to="/test" className="text-cyan-400 hover:underline">
+              Забыли пароль?
+            </Link>
+          </p>
           <p className="mt-6 text-sm text-gray-400 text-center">
             Нет аккаунта?{" "}
             <Link to="/register" className="text-cyan-400 hover:underline">

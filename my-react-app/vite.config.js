@@ -5,7 +5,10 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ['kokonaihub.onrender.com']
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    allowedHosts: ['localhost', '127.0.0.1', 'kokonaihub.onrender.com']
   },
   preview: {
     allowedHosts: ['kokonaihub.onrender.com'],

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Settings, CircleUserRound } from "lucide-react";
+import { Settings, CircleUserRound, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import Tiptap from "../components/TipTap";
 import { Loader2 } from "lucide-react";
 import { getCurrentUserEmail } from "../shared/api/auth";
 import { getUserByEmail, updateUserByEmail } from "../shared/api/users";
+import { Link } from "react-router-dom";
 
 function ProfilePage() {
   const [user_email, setUserEmail] = useState(null);
@@ -87,160 +88,202 @@ function ProfilePage() {
 
   if (error && !user) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen text-white bg-gradient-to-br from-teal-500 via-teal-400 to-cyan-500 gap-4">
-        <p>{error}</p>
-        <a href="/login" className="text-teal-100 hover:underline">
-          Войти
-        </a>
+      <div className="min-h-screen bg-[#090b10] text-white">
+        <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
+          <div className="rounded-lg border border-white/10 bg-black/20 p-6">
+            <p className="text-slate-300 mb-4">{error}</p>
+            <Link to="/login" className="text-cyan-300 hover:text-cyan-200 transition flex items-center gap-2">
+              <ArrowLeft size={18} />
+              Вернуться к входу
+            </Link>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (!user_email) {
     return (
-      <div className="flex justify-center items-center h-screen text-white bg-gradient-to-br from-teal-500 via-teal-400 to-cyan-500">
-        {error || "Пользователь не найден"}
+      <div className="min-h-screen bg-[#090b10] text-white flex items-center justify-center px-6">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-cyan-300 mx-auto mb-4" />
+          <p className="text-slate-300">{error || "Пользователь не найден"}</p>
+        </div>
       </div>
     );
   }
 
   if (loading && !user) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-teal-500 via-teal-400 to-cyan-500 text-white gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-white" />
-        <p className="text-lg">Загрузка профиля...</p>
+      <div className="min-h-screen bg-[#090b10] text-white flex items-center justify-center px-6">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-cyan-300 mx-auto mb-4" />
+          <p className="text-slate-300">Загрузка профиля...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-500 via-teal-400 to-cyan-500 text-white flex items-center justify-center px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="w-full max-w-3xl bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-8 mt-20"
-      >
-        {/* Header */}
-        <header className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-          {formData.avatarUrl ? (
-            <img
-              src={formData.avatarUrl}
-              alt="Avatar"
-              className="w-24 h-24 rounded-full object-cover border-4 border-teal-400"
-            />
-          ) : (
-            <CircleUserRound className="w-24 h-24 rounded-full text-teal-300" />
-          )}
-          <div className="text-center sm:text-left flex-1">
-            <h1 className="text-3xl font-semibold">
-              {user?.fullname || user?.email || "Пользователь"}
-            </h1>
-            {user?.fullname && <p className="text-white/80">{user?.email}</p>}
-            <p className="text-white/70">{user?.phone || ""}</p>
+    <div className="min-h-screen bg-[#090b10] text-white">
+      <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <Link 
+          to="/home" 
+          className="mb-6 inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 transition text-sm"
+        >
+          <ArrowLeft size={18} />
+          Назад
+        </Link>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="grid gap-6 lg:grid-cols-3"
+        >
+          {/* Avatar & Info Card */}
+          <div className="lg:col-span-1 rounded-lg border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.92),rgba(17,24,39,0.82))] p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                {formData.avatarUrl ? (
+                  <img
+                    src={formData.avatarUrl}
+                    alt="Avatar"
+                    className="w-32 h-32 rounded-full object-cover border-2 border-cyan-400/50"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-black/30 border-2 border-cyan-400/30 flex items-center justify-center">
+                    <CircleUserRound className="w-16 h-16 text-cyan-300/70" />
+                  </div>
+                )}
+              </div>
+              <h1 className="text-2xl font-semibold text-white">
+                {user?.fullname || user?.email || "Пользователь"}
+              </h1>
+              {user?.fullname && (
+                <p className="text-sm text-slate-400 mt-2">{user?.email}</p>
+              )}
+              {user?.phone && (
+                <p className="text-sm text-slate-400 mt-1">{user?.phone}</p>
+              )}
+            </div>
           </div>
-        </header>
 
-        {/* Body */}
-        {isEditing ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-            className="space-y-6 max-w-lg mx-auto"
-          >
-            <div>
-              <label htmlFor="fullname" className="block mb-1 font-medium">
-                ФИО
-              </label>
-              <input
-                id="fullname"
-                name="fullname"
-                type="text"
-                value={formData.fullname}
-                onChange={handleChange}
-                className="w-full px-4 py-2 bg-white/20 text-white placeholder:text-white/60 border border-white/30 rounded focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              />
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Bio Section */}
+            <div className="rounded-lg border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.92),rgba(17,24,39,0.82))] p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-white">О себе</h2>
+              </div>
+
+              {isEditing ? (
+                <div>
+                  <label htmlFor="bio" className="block mb-3 text-sm font-medium text-slate-300">
+                    Описание профиля
+                  </label>
+                  <Tiptap value={bioDraft} onChange={setBioDraft} />
+                </div>
+              ) : (
+                <div className="prose prose-invert max-w-none">
+                  {user?.bio ? (
+                    <div 
+                      className="text-slate-300 text-sm leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: user.bio }} 
+                    />
+                  ) : (
+                    <p className="text-slate-400 italic text-sm">
+                      Пользователь пока ничего не написал.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="email" className="block mb-1 font-medium">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 bg-white/20 text-white placeholder:text-white/60 border border-white/30 rounded focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              />
-            </div>
+            {/* Form Fields */}
+            {isEditing && (
+              <div className="rounded-lg border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.92),rgba(17,24,39,0.82))] p-6 space-y-4">
+                <div>
+                  <label htmlFor="fullname" className="block text-sm font-medium text-slate-300 mb-2">
+                    ФИО
+                  </label>
+                  <input
+                    id="fullname"
+                    name="fullname"
+                    type="text"
+                    value={formData.fullname}
+                    onChange={handleChange}
+                    placeholder="Введите ваше имя"
+                    className="w-full px-4 py-2.5 bg-black/20 text-white placeholder:text-white/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-transparent focus:outline-none transition"
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="phone" className="block mb-1 font-medium">
-                Телефон
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 bg-white/20 text-white placeholder:text-white/60 border border-white/30 rounded focus:ring-2 focus:ring-teal-400 focus:outline-none"
-              />
-            </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-2.5 bg-black/20 text-white placeholder:text-white/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-transparent focus:outline-none transition"
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="bio" className="block mb-1 font-medium">
-                О себе
-              </label>
-              <Tiptap value={bioDraft} onChange={setBioDraft} />
-            </div>
-          </form>
-        ) : (
-          <section className="max-w-lg prose prose-invert">
-            <h2 className="text-xl font-bold">О себе</h2>
-            {user?.bio ? (
-              <div dangerouslySetInnerHTML={{ __html: user.bio }} />
-            ) : (
-              <p className="text-white/70">
-                Пользователь пока ничего не написал.
-              </p>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-slate-300 mb-2">
+                    Телефон
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+7 (XXX) XXX-XX-XX"
+                    className="w-full px-4 py-2.5 bg-black/20 text-white placeholder:text-white/40 border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-transparent focus:outline-none transition"
+                  />
+                </div>
+              </div>
             )}
-          </section>
-        )}
 
-        {/* Buttons */}
-        {isEditing ? (
-          <div className="mt-6 flex justify-end gap-4">
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg transition flex items-center"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin mr-2" />
-              ) : null}
-              Сохранить
-            </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg transition"
-            >
-              Отмена
-            </button>
+            {/* Buttons */}
+            <div className="flex gap-3 justify-end">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => setEditing(false)}
+                    className="px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white rounded-lg transition text-sm font-medium border border-white/10"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={loading}
+                    className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition text-sm font-medium flex items-center gap-2"
+                  >
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Сохранить
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setEditing(true)}
+                  className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition text-sm font-medium flex items-center gap-2"
+                >
+                  <Settings size={18} />
+                  Редактировать 
+                </button>
+              )}
+            </div>
           </div>
-        ) : (
-          <button
-            onClick={() => setEditing(true)}
-            className="mt-6 ml-auto px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg transition flex items-center"
-          >
-            <Settings className="mr-2" />
-            Редактировать
-          </button>
-        )}
-      </motion.div>
+        </motion.div>
+      </main>
     </div>
   );
 }
